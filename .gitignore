@@ -1,0 +1,10 @@
+﻿################################################################################
+# Ce fichier .gitignore a été automatiquement créé par Microsoft(R) Visual Studio.
+################################################################################
+
+/WebAssemblyApp/Client/bin/Debug/net5.0
+/WebAssemblyApp/Client/obj
+/WebAssemblyApp/Server/bin/Debug/net5.0
+/WebAssemblyApp/Server/obj
+/WebAssemblyApp/Shared/bin/Debug/net5.0
+/WebAssemblyApp/Shared/obj
