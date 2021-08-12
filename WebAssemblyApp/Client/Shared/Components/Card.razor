@@ -1,0 +1,62 @@
+﻿@using WebAssemblyApp.Client.ViewModels
+@using WebAssemblyApp.Shared.Models
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@inject NavigationManager _navigationManager
+@using System.Security.Claims
+@inject IRadzenViewModel _radzenViewModel
+
+@if (_radzenViewModel.Products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var item in _radzenViewModel.Products)
+    {
+        <RadzenCard Style="width:600px; margin-bottom: 20px; height:500px;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div>Name:</div>
+                    <b>@item.Name</b>
+                    <div style="margin-top:20px">Description:</div>
+                    <b>@(item.Description)</b>
+                    <br />
+                   @* <RadzenImage Path="@item.Image" Style="width:100px;" />*@
+                </div>
+                <div class="col-md-6">
+                    <div>Freight:</div>
+                    <b>@item.Name</b>
+                    <div style="margin-top:20px">Ship country:</div>
+                    <b>@item.Description</b>
+                    <div style="margin-top:20px">Ship city:</div>
+                    <b>@(@item.Name)</b>
+                    <div style="margin-top:20px">Ship name:</div>
+                    <b>@(@item.Description)</b>
+                </div>
+            </div>
+        </RadzenCard>
+        }
+    }
+}
+
+    @code {
+        [CascadingParameter]
+        public Task<AuthenticationState> authenticationState { get; set; }
+
+protected override async Task OnInitializedAsync()
+    {
+
+        var authState = await authenticationState;//_authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            await _radzenViewModel.GetProducts();
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/", true);
+        }
+
+    }
+    }

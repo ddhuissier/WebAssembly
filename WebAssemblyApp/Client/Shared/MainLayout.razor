@@ -1,20 +1,48 @@
 ﻿@inherits LayoutComponentBase
-    <RadzenDialog />
-    <RadzenNotification />
-    <RadzenContextMenu />
-    <RadzenTooltip />
-    <div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
+@inject NavigationManager _navigationManager
+@inject HttpClient _httpClient
 
-        <div class="main">
-            <div class="top-row px-4">
-                <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-            </div>
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
 
-            <div class="content px-4">
-                @Body
-            </div>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+
+    <div class="main">
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="top-row px-4">
+                    <h4><b>Hello, @context.User.Identity.Name</b></h4> &nbsp;
+                    <button class="btn btn-danger" @onclick="LogoutUser">Logout</button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="top-row px-4">
+                    <button class="btn btn-primary" @onclick="LoginUser">Login</button>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
+
+        <div class="content px-4">
+            @Body
         </div>
     </div>
+</div>
+@code{ private async Task LogoutUser()
+    {
+        await _httpClient.GetAsync("user/logoutuser");
+        _navigationManager.NavigateTo("/", true);
+    }
+
+    private void LoginUser()
+    {
+        _navigationManager.NavigateTo("/", true);
+    } }

@@ -1,0 +1,34 @@
+﻿@page "/radzen"
+@using WebAssemblyApp.Client.Shared.Components
+
+<div class="row charts-container">
+    <h1>Radzen Charts</h1>
+    <div class="col-md-12 col-sm-12 p-4">
+        <RadzenTabs Change=@OnChange style="height: 880px" RenderMode="TabRenderMode.Client">
+            <Tabs>
+                <RadzenTabsItem Text="BarChart">
+                    <BarChart />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="DonutChart">
+                    <DonutChart />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Card">
+                    <Card />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="DataGrid">
+                    <DataGrid />
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Froms">
+                    <Froms />
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </div>
+</div>
+
+@code{
+    void OnChange(int index)
+    {
+        Console.Write($"Tab with index {index} was selected.");
+    }
+}

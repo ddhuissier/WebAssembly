@@ -1,0 +1,81 @@
+﻿@page "/catalog"
+@using WebAssemblyApp.Client.ViewModels
+@using WebAssemblyApp.Shared.Models
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@inject NavigationManager _navigationManager
+@using System.Security.Claims
+@inject ICatalogViewModel _catalogViewModel
+
+
+<h1>CATALOG</h1>
+
+<p>Catalog products from the server.</p>
+
+@if (_catalogViewModel.Products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="col-12">
+        <div class="col-12 row">
+            <input type="text" class="col-9 form-control" placeholder="search" />
+            <span>&nbsp;</span><button class="btn btn-primary">Search</button>
+        </div>
+        <br />
+        <table class="table">
+            @*<AddImage />*@
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in _catalogViewModel.Products)
+                {
+                    <tr>
+                        <td><a href="/productadmin/@item.Id">@item.Id</a></td>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td> </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authState = await authenticationState;//_authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var claim = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+           // _catalogViewModel.UserId = Convert.ToInt64(claim?.Value);
+            await _catalogViewModel.GetProducts();
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/",true);
+        }
+
+    }
+
+    private void NavigateToDetails()
+    {
+        _navigationManager.NavigateTo("/productadmin", true);
+    }
+
+}

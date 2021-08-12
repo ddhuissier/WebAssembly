@@ -1,0 +1,24 @@
+﻿@page "/productadmin/{Id:int}"
+@using WebAssemblyApp.Client.ViewModels
+@using WebAssemblyApp.Client.ViewModels.Contracts;
+@inject IProductViewModel _productViewModel
+
+
+<h3>Product Administration</h3>
+
+<div class="col-12">
+    <input type="text" @bind-value="_productViewModel.Name" class="form-control" placeholder="name">
+    <br />
+    <input type="text" @bind-value="_productViewModel.Description" class="form-control" placeholder="description">
+    <br />
+    @*<input type="text" @bind-value="_productViewModel.EmailAddress" class="form-control" placeholder="email address">
+        <br />*@
+    <button class="btn btn-primary" @onclick="_productViewModel.UpdateProduct">Update Product</button>
+    <span>&nbsp;&nbsp;</span>@_productViewModel.Message
+</div>
+@code{
+    [Parameter]
+    public int Id { get; set; }
+    protected override async Task OnInitializedAsync() => await _productViewModel.GetProduct(Id);
+}
+

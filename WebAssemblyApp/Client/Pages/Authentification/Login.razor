@@ -1,0 +1,39 @@
+@page "/"
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@using WebAssemblyApp.Client.ViewModels
+@using WebAssemblyApp.Shared.Models
+@inject ILoginViewModel _loginViewModel
+@inject NavigationManager _navigationManager
+
+
+<h2><b>Login</b></h2>
+<hr>
+
+<div class="col-6">
+    <input type="text" @bind="_loginViewModel.EmailAddress" class="form-control" placeholder="email address">
+</div>
+<br />
+<div class="col-6">
+    <input type="password" @bind="_loginViewModel.Password" class="form-control" placeholder="password">
+</div>
+<br />
+<div class="col-6">
+    <button class="btn btn-primary" @onclick="LoginUser">Login</button>
+</div>
+<br />
+<div class="col-6">
+    <a class="btn btn-block btn-social btn-google" @onclick="GoogleSignIn">
+        <span class="fa fa-google"></span> <b>Sign in with Google</b>
+    </a>
+</div>
+
+@code { public async Task LoginUser()
+    {
+        await _loginViewModel.LoginUser();
+        _navigationManager.NavigateTo("/catalog", true);
+    }
+    private void GoogleSignIn()
+    {
+        _navigationManager.NavigateTo("user/googlesignin", true);
+    }
+}

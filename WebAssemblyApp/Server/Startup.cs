@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Radzen;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using WebAssemblyApp.Server.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace WebAssemblyApp.Server
 {
@@ -29,6 +32,18 @@ namespace WebAssemblyApp.Server
             services.AddScoped<ContextMenuService>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddDbContext<WebAssemblyAppServerContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("WebAssemblyAppServerContext")));
+
+            services.AddAuthentication(options => {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie()
+            .AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +66,8 @@ namespace WebAssemblyApp.Server
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
