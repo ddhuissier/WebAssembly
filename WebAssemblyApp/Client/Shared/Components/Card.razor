@@ -1,17 +1,13 @@
-﻿@using WebAssemblyApp.Client.ViewModels
-@using WebAssemblyApp.Shared.Models
-@using WebAssemblyApp.Client.ViewModels.Contracts
-@inject NavigationManager _navigationManager
-@using System.Security.Claims
-@inject IRadzenViewModel _radzenViewModel
+﻿@using WebAssemblyApp.Shared.Models
 
-@if (_radzenViewModel.Products == null)
+
+@if (products == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    @foreach (var item in _radzenViewModel.Products)
+    @foreach (var item in products)
     {
         <RadzenCard Style="width:600px; margin-bottom: 20px; height:500px;">
             <div class="row">
@@ -40,23 +36,6 @@ else
 }
 
     @code {
-        [CascadingParameter]
-        public Task<AuthenticationState> authenticationState { get; set; }
-
-protected override async Task OnInitializedAsync()
-    {
-
-        var authState = await authenticationState;//_authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity.IsAuthenticated)
-        {
-            await _radzenViewModel.GetProducts();
-        }
-        else
-        {
-            _navigationManager.NavigateTo("/", true);
-        }
-
-    }
+        [Parameter]
+        public List<Product> products { get; set; }
     }

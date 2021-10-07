@@ -1,5 +1,96 @@
-﻿<h3>Froms</h3>
+﻿@using WebAssemblyApp.Shared.Models
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@inject IRadzenViewModel _radzenViewModel
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-xl-6">
+            <RadzenPanel AllowCollapse="true" Style="width:600px;margin-bottom: 20px; height:500px;"
+                         Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed"))>
+                <HeaderTemplate>
+                    <span style="float:left;">
+                        <RadzenIcon Icon="account_box" /><b style="font-size:30px">PRODUCT</b>
+                    </span>
+                </HeaderTemplate>
+                <ChildContent>
+                    <RadzenAccordion Expand=@(args => Expand(args, "Accordion with single expand", "expanded"))>
+                        <Items>
+                            <RadzenAccordionItem Text="ADD" Icon="add_circle_outline">
+                                <div class="row">
+                                    <div class="col-xl-6">
+                                        <div class="row">
+                                            <div class="col">
+                                                <FormProductAdmin popup=@popup/>
+                                            </div>
+                                            <div class="col">
+                                                <label>
+                                                    Display validators as popup
+                                                    <RadzenCheckBox @bind-Value=@popup></RadzenCheckBox>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </RadzenAccordionItem>
+                            <RadzenAccordionItem Text="UPDATE" Icon="update">
+                                <div class="row">
+                                    <div class="col-xl-12 mb-5">
+                                        <h3>Select product for update</h3>
+                                        <RadzenListBox AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                       Placeholder="Select product"
+                                                       @bind-Value=@productId Data=@products TextProperty="Name" ValueProperty="Id"
+                                                       Change=@(args => OnChange(args, "ListBox with filtering")) Style="height:200px">
+                                            <Template>
+                                                Name: @((context as Product).Name)
+                                            </Template>
+                                        </RadzenListBox>
+                                    </div>
+                                    <FormProductAdmin product=@selectedProduct popup=@popup />
+                                </div>
+                            </RadzenAccordionItem>
+                        </Items>
+                    </RadzenAccordion>
+
+                </ChildContent>
+            </RadzenPanel>
+        </div>
+        <div class="col-xl-6">
+            <DataGridCpt Products="products" />
+        </div>
+    </div>
+}
+
+
 
 @code {
+    [Parameter]
+    public List<Product> products { get; set; }
+
+    bool popup;
+
+    Product selectedProduct;
+
+    int productId;
+
+    void Change(string text)
+    {
+        Console.Write($"{text}");
+    }
+
+    void OnChange(object value, string name)
+    {
+        selectedProduct =products.Where(p=> p.Id == productId).FirstOrDefault();
+    }
+    void Expand(object value, string name, string action)
+    {
+        Console.Write($"{name} item with index {value} {action}");
+    }
+
+
 
 }

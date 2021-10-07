@@ -14,6 +14,7 @@ namespace WebAssemblyApp.Client.ViewModels
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string ProductPicDataUrl { get; set; }
         public byte[] Image { get; set; }
         public string Message { get; set; }
         private HttpClient _httpClient;
@@ -31,7 +32,7 @@ namespace WebAssemblyApp.Client.ViewModels
         public async Task UpdateProduct()
         {
             Product product = this;
-            await _httpClient.PutAsJsonAsync("api/products/1", product);
+            await _httpClient.PutAsJsonAsync("api/products/"+ product.Id, product);
             this.Message = "Product updated successfully";
         }
 
@@ -47,6 +48,7 @@ namespace WebAssemblyApp.Client.ViewModels
             Name = productViewModel.Name;
             Description = productViewModel.Description;
             Image = productViewModel.Image;
+            ProductPicDataUrl = productViewModel.ProductPicDataUrl;
         }
         public static implicit operator ProductViewModel(Product product)
         {
@@ -55,7 +57,8 @@ namespace WebAssemblyApp.Client.ViewModels
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Image = product.Image
+                Image = product.Image,
+                ProductPicDataUrl = product.ProductPicDataUrl
             };
         }
 
@@ -66,7 +69,8 @@ namespace WebAssemblyApp.Client.ViewModels
                 Id = productViewModel.Id,
                 Name = productViewModel.Name,
                 Description = productViewModel.Description,
-                Image = productViewModel.Image
+                Image = productViewModel.Image,
+                ProductPicDataUrl = productViewModel.ProductPicDataUrl
             };
         }
     }

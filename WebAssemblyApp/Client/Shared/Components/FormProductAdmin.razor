@@ -1,0 +1,97 @@
+﻿
+@using WebAssemblyApp.Shared.Models
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@inject IRadzenViewModel _radzenViewModel
+
+
+<RadzenTemplateForm TItem="Product" Data=@product Submit=@OnAddSubmit InvalidSubmit=@OnInvalidSubmit>
+    <RadzenFieldset Text="Product information">
+        <div class="row" style="margin-bottom: 48px">
+            <div class="col-md-4 align-right">
+                <RadzenLabel Text="Name" />
+            </div>
+            <div class="col">
+                <RadzenTextBox style="display: block" Name="Name" @bind-Value=@model.Name />
+                <RadzenRequiredValidator Component="Name" Text="Name is required" Popup=@popup Style="position: absolute" />
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 48px">
+            <div class="col-md-4">
+                <RadzenLabel Text="Description" />
+            </div>
+            <div class="col">
+                <RadzenTextBox style="display: block" Name="Description" @bind-Value=@model.Description />
+                <RadzenRequiredValidator Component="Description" Text="Description is required" Popup=@popup Style="position: absolute" />
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 48px">
+            <div class="col-md-4">
+                <RadzenLabel Text="Image" />
+            </div>
+            <div class="col">
+                <RadzenUpload Multiple="true" Accept="image/*" Url="upload/multiple" Style="margin-bottom: 20px;"
+                              Progress=@(args => OnProgress(args, "Images only upload")) />
+            </div>
+        </div>
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+
+@code {
+
+    [Parameter]
+    public Product product { get; set; }
+
+    [Parameter]
+    public bool popup { get; set; } = false;
+
+    RadzenUpload upload;
+
+    int progress;
+    string info;
+
+
+    //Validator
+    class Model
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+
+    Model model = new Model();
+
+    async Task OnAddSubmit(Product model)
+    {
+        Console.Write($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true })}");
+        _radzenViewModel.CurrentProduct = model;//new Product { Name = model.Name, Description = model.Description };
+        await _radzenViewModel.AddProduct();
+        product = _radzenViewModel.CurrentProduct;
+    }
+    async Task OnUpdateSubmit(Model model)
+    {
+        Console.Write($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true })}");
+        _radzenViewModel.CurrentProduct = new Product { Id = model.Id, Name = model.Name, Description = model.Description };
+        await _radzenViewModel.UpdateProduct(model.Id);
+        product = _radzenViewModel.CurrentProduct;
+    }
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        Console.Write($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true })}");
+    }
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+        this.progress = args.Progress;
+
+        if (args.Progress == 100)
+        {
+            foreach (var file in args.Files)
+            {
+                Console.Write($"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
+    }
+}

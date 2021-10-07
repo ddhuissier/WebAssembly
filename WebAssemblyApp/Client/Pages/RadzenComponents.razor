@@ -1,34 +1,61 @@
 ﻿@page "/radzen"
 @using WebAssemblyApp.Client.Shared.Components
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@using WebAssemblyApp.Shared.Models
+@inject NavigationManager _navigationManager
+@using System.Security.Claims
+@inject IRadzenViewModel _radzenViewModel
 
-<div class="row charts-container">
-    <h1>Radzen Charts</h1>
-    <div class="col-md-12 col-sm-12 p-4">
-        <RadzenTabs Change=@OnChange style="height: 880px" RenderMode="TabRenderMode.Client">
-            <Tabs>
-                <RadzenTabsItem Text="BarChart">
-                    <BarChart />
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="DonutChart">
-                    <DonutChart />
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Card">
-                    <Card />
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="DataGrid">
-                    <DataGrid />
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Froms">
-                    <Froms />
-                </RadzenTabsItem>
-            </Tabs>
-        </RadzenTabs>
+
+@if (_radzenViewModel.Products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row charts-container">
+        <h1>Radzen Components</h1>
+        <div class="col-md-12 col-sm-12 p-4">
+            <RadzenTabs style="height: 880px" RenderMode="TabRenderMode.Client">
+                <Tabs>
+                    <RadzenTabsItem Text="BarChart">
+                        <BarChart />
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="DonutChart">
+                        <DonutChart />
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Card">
+                        <Card products="_radzenViewModel.Products" />
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="DataGrid">
+                        <DataGridCpt Products="_radzenViewModel.Products" />
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Froms">
+                        <Froms products="_radzenViewModel.Products"/>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </div>
     </div>
-</div>
+}
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
 
-@code{
-    void OnChange(int index)
+    protected override async Task OnInitializedAsync()
     {
-        Console.Write($"Tab with index {index} was selected.");
+
+        var authState = await authenticationState;//_authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            await _radzenViewModel.GetProducts();
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/", true);
+        }
+
     }
 }

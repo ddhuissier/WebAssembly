@@ -12,6 +12,8 @@ namespace WebAssemblyApp.Client.ViewModels
     public class RadzenViewModel : IRadzenViewModel
     {
         public List<Product> Products { get; set; }
+        public Product CurrentProduct { get; set; }
+        public string Message { get; set; }
 
         private HttpClient _httpClient;
 
@@ -43,6 +45,25 @@ namespace WebAssemblyApp.Client.ViewModels
             Products = radzenViewModel.Products;
         }
 
+        public async Task UpdateProduct(int id)
+        {
+            Product product = CurrentProduct;
+            await _httpClient.PutAsJsonAsync("api/products/"+id, product);
+            await GetProducts();
+            Message = "Product updated successfully";
+        }
+        public async Task AddProduct()
+        {
+            Product product = CurrentProduct;
+            await _httpClient.PostAsJsonAsync("api/products", product);
+            await GetProducts();
+            Message = "Product added successfully";
+        }
+        public void DeleteProducts(List<Product> selectedProducts)
+        {
+            selectedProducts.ForEach(p => _httpClient.DeleteAsync("api/products/"+ p.Id));
+            Message = "Product deleted successfully";
+        }
         public static implicit operator RadzenViewModel(List<Product> products)
         {
             return new RadzenViewModel

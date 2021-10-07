@@ -1,0 +1,81 @@
+﻿@using WebAssemblyApp.Shared.Models
+@using WebAssemblyApp.Client.ViewModels.Contracts
+@inject IRadzenViewModel _radzenViewModel
+
+<RadzenDataGrid IsLoading="@isLoading" Count="@count" Data="@data" LoadData="@LoadData" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
+                AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" TItem="Product" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedProducts>
+    <Columns>
+        <RadzenDataGridColumn TItem="Product" Width="40px" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenCheckBox TriState="false" TValue="bool" Value="@(products.Any(i => selectedProducts != null && selectedProducts.Contains(i)))"
+                                Change="@(args => selectedProducts = args ? products.ToList() : null)" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox TriState="false" Value="@(selectedProducts != null && selectedProducts.Contains(data))" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Product" Property="Id" Title="Id" Width="50px" />
+        <RadzenDataGridColumn TItem="Product" Property="Name" Filterable="false" Title="Name" Frozen="true" Width="150px" TextAlign="TextAlign.Center" />
+        @*<RadzenDataGridColumn TItem="Product" Title="Image" Sortable="false" Filterable="false" Width="200px">
+            <Template Context="data">
+                <RadzenImage Path="@data.Image" style="width: 40px; height: 40px; border-radius: 8px;" />
+            </Template>
+        </RadzenDataGridColumn>*@
+        <RadzenDataGridColumn TItem="Product" Property="Description" Title="Description" Width="150px" TextAlign="TextAlign.Left"/>
+    </Columns>
+</RadzenDataGrid>
+
+@if (selectedProducts != null && selectedProducts.Count > 0)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <button class="btn btn-danger" @onclick="delete">
+                DELETE
+            </button>
+            <p>@message</p>
+        </div>
+    </div>
+}
+
+@code {
+
+    private List<Product> products;
+    string message = "";
+
+    [Parameter]
+    public List<Product> Products
+    {
+        get { return products; }
+        set
+        {
+            products = value;
+        }
+    }
+    public List<Product> data { get; set; }
+
+    public IList<Product> selectedProducts { get; set; }
+
+    bool isLoading;
+    int count;
+
+
+    void LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        // Update the count
+        count = products.Count;
+        data = products.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
+        isLoading = false;
+    }
+
+    void delete()
+    {
+        _radzenViewModel.DeleteProducts(selectedProducts.ToList());
+        message = JsonSerializer.Serialize(_radzenViewModel.Products);
+        //products = _radzenViewModel.Products;
+    }
+
+}
